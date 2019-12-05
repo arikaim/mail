@@ -11,7 +11,7 @@ namespace Arikaim\Core\Mail;
 
 use Arikaim\Core\Mail\Interfaces\MailInterface;
 use Arikaim\Core\Interfaces\MailerInterface;
-use Arikaim\Core\Interfaces\HtmlPageInterface;
+use Arikaim\Core\Interfaces\View\HtmlPageInterface;
 use Arikaim\Core\Utils\Utils;
 
 /**

@@ -87,6 +87,7 @@ class Mail implements MailInterface
     public static function sendTo($email, $name = null)
     {
         $mail = new static();
+
         return $mail->to($email,$name)->send();
     }
 
@@ -121,7 +122,7 @@ class Mail implements MailInterface
      */
     public function attach($file)
     {
-        $attachment = Swift_Attachment::fromPath($file);
+        $attachment = \Swift_Attachment::fromPath($file);
         $this->message->attach($attachment);
 
         return $this;
@@ -137,6 +138,7 @@ class Mail implements MailInterface
     public function from($email, $name = null)
     {
         $this->message->setFrom($email,$name);
+
         return $this;
     } 
 
@@ -280,7 +282,7 @@ class Mail implements MailInterface
         }
         
         // subject
-        $subject = (isset($properties['subject']) == true) ? $properties['subject'] : "";
+        $subject = (isset($properties['subject']) == true) ? $properties['subject'] : '';
         if (empty($subject) == false) {
             $this->subject($subject);
         }

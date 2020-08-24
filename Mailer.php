@@ -40,12 +40,14 @@ class Mailer implements MailerInterface
      * @var OptionsInterface
      */
     private $options;
-
+ 
     /**
-     * Constructor
-     * 
-     * @param \Swift_Transport $transportDriver
-     */
+    * Constructor
+    *
+    * @param OptionsInterface $options
+    * @param HtmlPageInterface $page
+    * @param \Swift_Transport $transportDriver
+    */
     public function __construct(OptionsInterface $options, HtmlPageInterface $page = null, $transportDriver = null) 
     {
         $this->error = null;

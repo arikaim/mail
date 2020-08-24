@@ -42,6 +42,9 @@ class Mail implements MailInterface
 
     /**
      * Constructor
+     *
+     * @param MailerInterface $mailer
+     * @param HtmlPageInterface $page
      */
     public function __construct(MailerInterface $mailer, HtmlPageInterface $page = null)
     {
@@ -220,6 +223,7 @@ class Mail implements MailInterface
     public function message($message)
     {
         $this->message->setBody($message);
+
         return $this;
     }
 
@@ -265,7 +269,7 @@ class Mail implements MailInterface
      */
     public function loadComponent($componentName, $params = [])
     {
-        if (is_object($this->page) == false) {
+        if (\is_object($this->page) == false) {
             return $this;
         }
 

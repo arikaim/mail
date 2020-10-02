@@ -73,25 +73,13 @@ class Mail implements MailInterface
     /**
      * Create mail
      *
-     * @return Mail
+     * @param MailerInterface $mailer
+     * @param HtmlPageInterface $page
+     * @return MailInterface
      */
-    public static function create()
+    public static function create(MailerInterface $mailer, HtmlPageInterface $page = null)
     {
-        return new static();
-    }
-
-    /**
-     * Send email to 
-     *
-     * @param string|array $email
-     * @param string|null $name
-     * @return bool
-     */
-    public static function sendTo($email, $name = null)
-    {
-        $mail = new static();
-
-        return $mail->to($email,$name)->send();
+        return new Self($mailer,$page);
     }
 
     /**
@@ -233,7 +221,7 @@ class Mail implements MailInterface
      * @param string $type
      * @return Mail
      */
-    public function contentType($type = "text/plain")
+    public function contentType($type = 'text/plain')
     {
         $this->message->setContentType($type);
 

@@ -261,7 +261,7 @@ class Mail implements MailInterface
             return $this;
         }
 
-        $component = $this->page->createHtmlComponent($componentName,$params,null,false)->renderComponent();
+        $component = $this->page->createHtmlComponent($componentName,$params,null,false)->renderComponent(false);
         $properties = $component->getProperties();
         $body = $component->getHtmlCode();
 

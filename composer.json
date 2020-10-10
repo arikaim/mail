@@ -14,7 +14,8 @@
         "php": ">=7.1",        
         "arikaim/utils": "^1.0.0",
         "arikaim/interfaces": "^1.0.0",
-        "swiftmailer/swiftmailer": "5.4.*"
+        "swiftmailer/swiftmailer": "6.1.*",
+        "egulias/email-validator": "2.1.14"
     },
     "autoload": {       
         "psr-4": {

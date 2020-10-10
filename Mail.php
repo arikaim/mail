@@ -11,8 +11,6 @@ namespace Arikaim\Core\Mail;
 
 use Arikaim\Core\Mail\Interfaces\MailInterface;
 use Arikaim\Core\Interfaces\MailerInterface;
-use Arikaim\Core\Interfaces\View\HtmlPageInterface;
-use Arikaim\Core\Utils\Utils;
 
 /**
  * Mail base class
@@ -34,22 +32,13 @@ class Mail implements MailInterface
     private $mailer;
 
     /**
-     * Html page
-     *
-     * @var HtmlPageInterface
-     */
-    private $page;
-
-    /**
      * Constructor
      *
      * @param MailerInterface $mailer
-     * @param HtmlPageInterface $page
      */
-    public function __construct(MailerInterface $mailer, HtmlPageInterface $page = null)
+    public function __construct(MailerInterface $mailer)
     {
         $this->mailer = $mailer;
-        $this->page = $page;
         $this->message = new \Swift_Message();
         $this->setDefaultFrom();
     } 
@@ -61,8 +50,9 @@ class Mail implements MailInterface
      */
     public function setDefaultFrom()
     {
-        $from = $this->mailer->getOptions()->get('mailer.from.email',null);
-        $fromName = $this->mailer->getOptions()->get('mailer.from.name',null);
+        $options = $this->mailer->getOptions();
+        $from = (isset($options['mailer']['from']['email']) == true) ? $options['mailer']['from']['email'] : null;
+        $fromName = (isset($options['mailer']['from']['name']) == true) ? $options['mailer']['from']['name'] : null;
         if (empty($from) == false) {
             $this->from($from,$fromName);
         }
@@ -74,12 +64,11 @@ class Mail implements MailInterface
      * Create mail
      *
      * @param MailerInterface $mailer
-     * @param HtmlPageInterface $page
      * @return MailInterface
      */
-    public static function create(MailerInterface $mailer, HtmlPageInterface $page = null)
+    public static function create(MailerInterface $mailer)
     {
-        return new Self($mailer,$page);
+        return new Self($mailer);
     }
 
     /**
@@ -246,40 +235,6 @@ class Mail implements MailInterface
     public function getMessage()
     {
         return $this->message;
-    }
-
-    /**
-     * Load email message from html component
-     *
-     * @param string $componentName
-     * @param array $params
-     * @return object
-     */
-    public function loadComponent($componentName, $params = [])
-    {
-        if (\is_object($this->page) == false) {
-            return $this;
-        }
-
-        $component = $this->page->createHtmlComponent($componentName,$params,null,false)->renderComponent(false);
-        $properties = $component->getProperties();
-        $body = $component->getHtmlCode();
-
-        $this->message($body);
-
-        if (Utils::hasHtml($body) == true) {
-            $this->contentType('text/html');
-        } else {
-            $this->contentType('text/plain');
-        }
-        
-        // subject
-        $subject = (isset($properties['subject']) == true) ? $properties['subject'] : '';
-        if (empty($subject) == false) {
-            $this->subject($subject);
-        }
-    
-        return $this;
     }
 
     /**

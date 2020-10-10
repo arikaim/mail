@@ -76,7 +76,12 @@ class Mailer implements MailerInterface
      */
     public function getCompilers()
     {
-        return (isset($this->options['mailer']['email']['compillers']) == true) ? $this->options['mailer']['email']['compillers'] : [];
+        $compilers = (isset($this->options['mailer']['email']['compillers']) == true) ? $this->options['mailer']['email']['compillers'] : [];
+        if (\is_string($compilers) == true) {
+            $compilers = \json_encode($compilers);
+        }
+
+        return (\is_array($compilers) == false) ? [] : $compilers;
     }
 
     /**

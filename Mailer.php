@@ -76,7 +76,7 @@ class Mailer implements MailerInterface
      */
     public function getCompilers()
     {
-        $compilers = (isset($this->options['mailer']['email']['compillers']) == true) ? $this->options['mailer']['email']['compillers'] : [];
+        $compilers = $this->options['mailer']['email']['compillers'] ?? [];
         if (\is_string($compilers) == true) {
             $compilers = \json_encode($compilers);
         }
@@ -128,7 +128,7 @@ class Mailer implements MailerInterface
         }
         
         // subject
-        $subject = (isset($properties['subject']) == true) ? $properties['subject'] : '';
+        $subject = $properties['subject'] ?? '';
         if (empty($subject) == false) {
             $mail->subject($subject);
         }
@@ -161,11 +161,11 @@ class Mailer implements MailerInterface
     /**
      * Get smtp ssl
      *
-     * @return string|null
+     * @return string|false
      */
     public function getSmtpSsl()
     {
-        return (isset($this->options['mailer']['smpt']['ssl']) == true) ? $this->options['mailer']['smpt']['ssl'] : false;
+        return $this->options['mailer']['smpt']['ssl'] ?? false;
     }
 
 
@@ -176,7 +176,7 @@ class Mailer implements MailerInterface
      */
     public function getSmtpHost()
     {
-        return (isset($this->options['mailer']['smpt']['host']) == true) ? $this->options['mailer']['smpt']['host'] : null;
+        return $this->options['mailer']['smpt']['host'] ?? null;
     }
 
     /**
@@ -186,7 +186,7 @@ class Mailer implements MailerInterface
      */
     public function getSmtpPort()
     {
-        return (isset($this->options['mailer']['smpt']['port']) == true) ? $this->options['mailer']['smpt']['port'] : null;
+        return $this->options['mailer']['smpt']['port'] ?? null;
     }
 
     /**
@@ -196,7 +196,7 @@ class Mailer implements MailerInterface
      */
     public function getUserName()
     {
-        return (isset($this->options['mailer']['username']) == true) ? $this->options['mailer']['username'] : null;
+        return $this->options['mailer']['username'] ?? null;
     }
 
     /**
@@ -206,7 +206,7 @@ class Mailer implements MailerInterface
      */
     public function getPassword()
     {
-        return (isset($this->options['mailer']['password']) == true) ? $this->options['mailer']['password'] : null;
+        return $this->options['mailer']['password'] ?? null;
     }
 
     /**
@@ -216,7 +216,7 @@ class Mailer implements MailerInterface
      */
     public function isSendmailTransport()
     {
-        return (isset($this->options['mailer']['use']['sendmail']) == true) ? $this->options['mailer']['use']['sendmail'] : false;
+        return (bool)$this->options['mailer']['use']['sendmail'] ?? false;
     } 
 
     /**
@@ -239,7 +239,8 @@ class Mailer implements MailerInterface
             $this->error = $e->getMessage();
             $result = false;
         }
-        return ($result > 0) ? true : false;
+        
+        return ($result > 0);
     }
 
     /**

@@ -89,15 +89,14 @@ class Mailer implements MailerInterface
      *
      * @param string|null $componentName
      * @param array $params
-     * @param string|null $framework
      * @param string|null language
      * @return MailInterface
      */
-    public function create($componentName = null, $params = [], $framework = null, $language = null)
+    public function create($componentName = null, $params = [], $language = null)
     {
         $mail = new Mail($this);
 
-        return (empty($componentName) == false) ? $this->loadEmailComponent($componentName,$params,$framework,$language) : $mail;        
+        return (empty($componentName) == false) ? $this->loadEmailComponent($componentName,$params,$language) : $mail;        
     }
 
     /**
@@ -105,13 +104,12 @@ class Mailer implements MailerInterface
      *
      * @param string $componentName
      * @param array $params
-     * @param string|null $framework
      * @param string|null $language
      * @return MailInterface
      */
-    public function loadEmailComponent($componentName, $params = [], $framework = null, $language = null)
+    public function loadEmailComponent($componentName, $params = [], $language = null)
     {
-        $emailComponent = $this->page->createEmailComponent($componentName,$params,$framework,$language);
+        $emailComponent = $this->page->createEmailComponent($componentName,$params,$language);
         $emailComponent->setEmailCompillers($this->getCompilers());
 
         $component = $emailComponent->renderComponent();

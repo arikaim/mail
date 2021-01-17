@@ -31,24 +31,31 @@ class Mailer implements MailerInterface
     /**
      * Mailer error message
      *
-     * @var string
+     * @var string|null
      */
-    private $error;
+    private $error = null;
 
     /**
      * Options
      *
      * @var array
      */
-    private $options;
+    private $options = [];
  
+    /**
+     * Page html component
+     *
+     * @var HtmlPageInterface|null
+     */
+    private $page;
+
     /**
     * Constructor
     *
     * @param array $options
     * @param HtmlPageInterface $page
     */
-    public function __construct(array $options, HtmlPageInterface $page = null) 
+    public function __construct(array $options, ?HtmlPageInterface $page = null) 
     {
         $this->error = null;
         $this->options = $options;
@@ -64,7 +71,7 @@ class Mailer implements MailerInterface
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -74,7 +81,7 @@ class Mailer implements MailerInterface
      *
      * @return array
      */
-    public function getCompilers()
+    public function getCompilers(): array
     {
         $compilers = $this->options['mailer']['email']['compillers'] ?? [];
         if (\is_string($compilers) == true) {
@@ -92,7 +99,7 @@ class Mailer implements MailerInterface
      * @param string|null language
      * @return MailInterface
      */
-    public function create($componentName = null, $params = [], $language = null)
+    public function create(?string $componentName = null, array $params = [], ?string $language = null)
     {
         $mail = new Mail($this);
 
@@ -107,7 +114,7 @@ class Mailer implements MailerInterface
      * @param string|null $language
      * @return MailInterface
      */
-    public function loadEmailComponent($componentName, $params = [], $language = null)
+    public function loadEmailComponent(string $componentName, array $params = [], ?string $language = null)
     {
         $emailComponent = $this->page->createEmailComponent($componentName,$params,$language);
         $emailComponent->setEmailCompillers($this->getCompilers());
@@ -172,7 +179,7 @@ class Mailer implements MailerInterface
      *
      * @return string|null
      */
-    public function getSmtpHost()
+    public function getSmtpHost(): ?string
     {
         return $this->options['mailer']['smpt']['host'] ?? null;
     }
@@ -182,7 +189,7 @@ class Mailer implements MailerInterface
      *
      * @return string|null
      */
-    public function getSmtpPort()
+    public function getSmtpPort(): ?string
     {
         return $this->options['mailer']['smpt']['port'] ?? null;
     }
@@ -192,7 +199,7 @@ class Mailer implements MailerInterface
      *
      * @return string|null
      */
-    public function getUserName()
+    public function getUserName(): ?string
     {
         return $this->options['mailer']['username'] ?? null;
     }
@@ -202,7 +209,7 @@ class Mailer implements MailerInterface
      *
      * @return string|null
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->options['mailer']['password'] ?? null;
     }
@@ -212,7 +219,7 @@ class Mailer implements MailerInterface
      *
      * @return boolean
      */
-    public function isSendmailTransport()
+    public function isSendmailTransport(): bool
     {
         return (bool)$this->options['mailer']['use']['sendmail'] ?? false;
     } 
@@ -223,7 +230,7 @@ class Mailer implements MailerInterface
      * @param MailInterface $message
      * @return bool
      */
-    public function send($message)
+    public function send($message): bool
     {
         $this->error = null;
 
@@ -267,7 +274,7 @@ class Mailer implements MailerInterface
      *
      * @return string|null
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): ?string
     {
         return $this->error;
     }    

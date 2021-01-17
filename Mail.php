@@ -87,7 +87,7 @@ class Mail implements MailInterface
      * @param string $subject
      * @return Mail
      */
-    public function subject($subject)
+    public function subject(string $subject)
     {
         $this->message->setSubject($subject);
 
@@ -100,7 +100,7 @@ class Mail implements MailInterface
      * @param string $file
      * @return Mail
      */
-    public function attach($file)
+    public function attach(string $file)
     {
         $attachment = \Swift_Attachment::fromPath($file);
         $this->message->attach($attachment);
@@ -115,7 +115,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Mail
      */
-    public function from($email, $name = null)
+    public function from($email, ?string $name = null)
     {
         $this->message->setFrom($email,$name);
 
@@ -129,7 +129,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Mail
      */
-    public function to($email, $name = null)
+    public function to($email, ?string $name = null)
     {        
         $this->message->setTo($email,$name);   
 
@@ -143,7 +143,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Mail
      */
-    public function replyTo($email, $name = null)
+    public function replyTo($email, ?string $name = null)
     {
         $this->message->setReplyTo($email,$name);
 
@@ -157,7 +157,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Mail
      */
-    public function cc($email, $name = null)
+    public function cc($email, ?string $name = null)
     {
         $this->message->setCc($email,$name);
 
@@ -171,7 +171,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Mail
      */
-    public function bcc($email, $name = null)
+    public function bcc($email, ?string $name = null)
     {
         $this->message->setBcc($email,$name);
 
@@ -184,7 +184,7 @@ class Mail implements MailInterface
      * @param integer $priority
      * @return Mail
      */
-    public function priority($priority = 3)
+    public function priority(int $priority = 3)
     {
         $this->message->setPriority($priority);
 
@@ -197,7 +197,7 @@ class Mail implements MailInterface
      * @param string $message
      * @return Mail
      */
-    public function message($message)
+    public function message(string $message)
     {
         $this->message->setBody($message);
 
@@ -210,7 +210,7 @@ class Mail implements MailInterface
      * @param string $type
      * @return Mail
      */
-    public function contentType($type = 'text/plain')
+    public function contentType(string $type = 'text/plain')
     {
         $this->message->setContentType($type);
 
@@ -222,7 +222,7 @@ class Mail implements MailInterface
      *
      * @return string
      */
-    public function getBody()
+    public function getBody(): ?string
     {
         return $this->message->getBody();
     }
@@ -242,7 +242,7 @@ class Mail implements MailInterface
      *
      * @return bool
      */
-    public function send() 
+    public function send(): bool 
     {
         return $this->mailer->send($this);
     }
@@ -252,7 +252,7 @@ class Mail implements MailInterface
      *
      * @return string
      */
-    public function getError()
+    public function getError(): ?string
     {
         return $this->mailer->getErrorMessage();
     }

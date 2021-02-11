@@ -173,7 +173,26 @@ class Mailer implements MailerInterface
         return $this->options['mailer']['smpt']['ssl'] ?? false;
     }
 
+    /**
+     * Get from email option
+     *
+     * @return string
+     */
+    public function getFromEmail(): string
+    {
+        return $this->options['mailer']['from']['email'] ?? '';
+    } 
 
+    /**
+     * Get from name option
+     *
+     * @return string
+     */
+    public function getFromName(): string
+    {
+        return $this->options['mailer']['from']['name'] ?? '';
+    }
+   
     /**
      * Get smtp host
      *
@@ -236,6 +255,10 @@ class Mailer implements MailerInterface
 
         $message->build();
         $mail = $message->getMessage();
+
+        if (empty($mail->getFrom()) == true) {
+            $mail->setFrom($this->getFromEmail(),$this->getFromName());
+        }
 
         try {
             $result = $this->mailer->send($mail);

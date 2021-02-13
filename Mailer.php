@@ -15,6 +15,7 @@ use Arikaim\Core\Utils\Utils;
 use Arikaim\Core\Mail\Interfaces\MailInterface;
 use Arikaim\Core\Interfaces\MailerInterface;
 use Arikaim\Core\Interfaces\View\HtmlPageInterface;
+use Arikaim\Core\Mail\Interfaces\MailerDriverInterface;
 
 /**
  * Send emails
@@ -55,15 +56,29 @@ class Mailer implements MailerInterface
     * @param array $options
     * @param HtmlPageInterface $page
     */
-    public function __construct(array $options, ?HtmlPageInterface $page = null) 
+    public function __construct(
+        array $options, 
+        ?HtmlPageInterface $page = null, 
+        ?MailerDriverInterface $driver = null
+    ) 
     {
         $this->error = null;
         $this->options = $options;
         $this->page = $page;
 
-        $transport = $this->createTransportDriver();
+        $transport = (empty($driver) == true) ? Self::crateSendmailTranspart() : $driver->getMailerTransport();
     
         $this->mailer = new \Swift_Mailer($transport);
+    }
+
+    /**
+     * Create sendmail transport
+     *
+     * @return Swift_Transport
+     */
+    public static function crateSendmailTranspart()
+    {
+        return new \Swift_SendmailTransport('/usr/sbin/sendmail -bs');
     }
 
     /**
@@ -83,7 +98,7 @@ class Mailer implements MailerInterface
      */
     public function getCompilers(): array
     {
-        $compilers = $this->options['mailer']['email']['compillers'] ?? [];
+        $compilers = $this->options['compillers'] ?? [];
         if (\is_string($compilers) == true) {
             $compilers = \json_encode($compilers);
         }
@@ -142,45 +157,13 @@ class Mailer implements MailerInterface
     }
 
     /**
-     * Create transport driver
-     *
-     * @return \Swift_Transport
-     */
-    private function createTransportDriver()
-    {
-        if ($this->isSendmailTransport() === true) {
-            return new \Swift_SendmailTransport('/usr/sbin/sendmail -bs');
-        }    
-
-        $transport = new \Swift_SmtpTransport($this->getSmtpHost(),$this->getSmtpPort());
-        $transport->setUsername($this->getUserName());
-        $transport->setPassword($this->getPassword());   
-        
-        if ($this->getSmtpSsl() == true) {
-            $transport->setEncryption('ssl');    
-        }              
-       
-        return $transport;
-    }
-
-    /**
-     * Get smtp ssl
-     *
-     * @return string|false
-     */
-    public function getSmtpSsl()
-    {
-        return $this->options['mailer']['smpt']['ssl'] ?? false;
-    }
-
-    /**
      * Get from email option
      *
      * @return string
      */
     public function getFromEmail(): string
     {
-        return $this->options['mailer']['from']['email'] ?? '';
+        return $this->options['from_email'] ?? '';
     } 
 
     /**
@@ -190,59 +173,9 @@ class Mailer implements MailerInterface
      */
     public function getFromName(): string
     {
-        return $this->options['mailer']['from']['name'] ?? '';
+        return $this->options['from_name'] ?? '';
     }
    
-    /**
-     * Get smtp host
-     *
-     * @return string|null
-     */
-    public function getSmtpHost(): ?string
-    {
-        return $this->options['mailer']['smpt']['host'] ?? null;
-    }
-
-    /**
-     * Get smtp port
-     *
-     * @return string|null
-     */
-    public function getSmtpPort(): ?string
-    {
-        return $this->options['mailer']['smpt']['port'] ?? null;
-    }
-
-    /**
-     * Get smtp username
-     *
-     * @return string|null
-     */
-    public function getUserName(): ?string
-    {
-        return $this->options['mailer']['username'] ?? null;
-    }
-
-    /**
-     * Get smtp password
-     *
-     * @return string|null
-     */
-    public function getPassword(): ?string
-    {
-        return $this->options['mailer']['password'] ?? null;
-    }
-
-    /**
-     * Return true if transport is sendmail
-     *
-     * @return boolean
-     */
-    public function isSendmailTransport(): bool
-    {
-        return (bool)$this->options['mailer']['use']['sendmail'] ?? false;
-    } 
-
     /**
      * Send email
      *

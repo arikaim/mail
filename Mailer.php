@@ -16,12 +16,20 @@ use Arikaim\Core\Mail\Interfaces\MailInterface;
 use Arikaim\Core\Interfaces\MailerInterface;
 use Arikaim\Core\Interfaces\View\HtmlPageInterface;
 use Arikaim\Core\Mail\Interfaces\MailerDriverInterface;
+use Arikaim\Core\Interfaces\LoggerInterface;
+
+use Arikaim\Core\Logger\Traits\LoggerTrait;
 
 /**
  * Send emails
  */
 class Mailer implements MailerInterface
 {
+    use LoggerTrait;
+
+    const LOG_ERROR_MESSAGE = 'Error send email';
+    const LOG_INFO_MESSAGE  = 'Email send successful.';
+
     /**
      * Mailer object
      *
@@ -51,6 +59,13 @@ class Mailer implements MailerInterface
     private $page;
 
     /**
+     * Driver name
+     *
+     * @var string|null
+     */
+    private $driverName = null;
+
+    /**
     * Constructor
     *
     * @param array $options
@@ -59,15 +74,23 @@ class Mailer implements MailerInterface
     public function __construct(
         array $options, 
         ?HtmlPageInterface $page = null, 
-        ?MailerDriverInterface $driver = null
+        ?MailerDriverInterface $driver = null,
+        ?LoggerInterface $logger = null
     ) 
     {
         $this->error = null;
         $this->options = $options;
         $this->page = $page;
+        $this->setLogger($logger);
 
-        $transport = (empty($driver) == true) ? Self::crateSendmailTranspart() : $driver->getMailerTransport();
-    
+        if (empty($driver) == true) {
+            $transport = Self::crateSendmailTranspart();
+            $this->driverName = 'sendmail';
+        } else {
+            $transport = $driver->getMailerTransport();
+            $this->driverName = $driver->getDriverName();
+        }   
+      
         $this->mailer = new \Swift_Mailer($transport);
     }
 
@@ -89,6 +112,18 @@ class Mailer implements MailerInterface
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    /**
+     * Get option value
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getOption(string $key, $default = null)
+    {
+        return $this->options[$key] ?? $default;
     }
 
     /**
@@ -196,12 +231,25 @@ class Mailer implements MailerInterface
         try {
             $result = $this->mailer->send($mail);
         } catch (\Exception $e) {
-            //throw $th;
             $this->error = $e->getMessage();
             $result = false;
         }
         
-        return ($result > 0);
+        if ($result > 0) {
+            if ($this->getOption('log',false) == true) {  
+                $this->logInfo(Self::LOG_INFO_MESSAGE,['driver' => $this->driverName]);
+            }
+            return true;
+        } 
+
+        if ($this->getOption('log_error',false) == true) {
+            $this->logError(Self::LOG_ERROR_MESSAGE,[
+                'error'  => $this->error,
+                'driver' => $this->driverName
+            ]);
+        }
+
+        return false;       
     }
 
     /**

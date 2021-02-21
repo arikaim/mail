@@ -230,6 +230,10 @@ class Mailer implements MailerInterface
 
         try {
             $result = $this->mailer->send($mail);
+            
+        } catch (\Swift_TransportException $e) { 
+            $this->error = $e->getMessage();
+            $result = false;
         } catch (\Exception $e) {
             $this->error = $e->getMessage();
             $result = false;

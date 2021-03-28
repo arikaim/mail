@@ -51,8 +51,8 @@ class Mail implements MailInterface
     public function setDefaultFrom()
     {
         $options = $this->mailer->getOptions();
-        $from = (isset($options['mailer']['from']['email']) == true) ? $options['mailer']['from']['email'] : null;
-        $fromName = (isset($options['mailer']['from']['name']) == true) ? $options['mailer']['from']['name'] : null;
+        $from = $options['mailer']['from']['email'] ?? null;
+        $fromName = $options['mailer']['from']['name'] ?? null;
         if (empty($from) == false) {
             $this->from($from,$fromName);
         }

@@ -20,4 +20,11 @@ interface MailerDriverInterface
      * @return \Swift_Transport
      */
     public function getMailerTransport();
+
+    /**
+     * Return driver name.
+     *
+     * @return string|null
+     */
+    public function getDriverName(): ?string;
 }

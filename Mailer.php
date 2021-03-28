@@ -14,11 +14,12 @@ use Arikaim\Core\Utils\Utils;
 
 use Arikaim\Core\Mail\Interfaces\MailInterface;
 use Arikaim\Core\Interfaces\MailerInterface;
-use Arikaim\Core\Interfaces\View\HtmlPageInterface;
+use Arikaim\Core\Interfaces\View\EmailViewInterface;
 use Arikaim\Core\Mail\Interfaces\MailerDriverInterface;
 use Arikaim\Core\Interfaces\LoggerInterface;
 
 use Arikaim\Core\Logger\Traits\LoggerTrait;
+use Exception;
 
 /**
  * Send emails
@@ -27,7 +28,7 @@ class Mailer implements MailerInterface
 {
     use LoggerTrait;
 
-    const LOG_ERROR_MESSAGE = 'Error send email';
+    const LOG_ERROR_MESSAGE = 'Error send email.';
     const LOG_INFO_MESSAGE  = 'Email send successful.';
 
     /**
@@ -52,11 +53,11 @@ class Mailer implements MailerInterface
     private $options = [];
  
     /**
-     * Page html component
+     * Email component renderer
      *
-     * @var HtmlPageInterface|null
+     * @var EmailViewInterface|null
      */
-    private $page;
+    private $view;
 
     /**
      * Driver name
@@ -69,18 +70,17 @@ class Mailer implements MailerInterface
     * Constructor
     *
     * @param array $options
-    * @param HtmlPageInterface $page
+    * @param HtmlComponentInterface $renderer
     */
     public function __construct(
         array $options, 
-        ?HtmlPageInterface $page = null, 
+        EmailViewInterface $view, 
         ?MailerDriverInterface $driver = null,
         ?LoggerInterface $logger = null
     ) 
     {
-        $this->error = null;
         $this->options = $options;
-        $this->page = $page;
+        $this->view = $view;
         $this->setLogger($logger);
 
         if (empty($driver) == true) {
@@ -90,7 +90,8 @@ class Mailer implements MailerInterface
             $transport = $driver->getMailerTransport();
             $this->driverName = $driver->getDriverName();
         }   
-      
+
+        $this->error = null;
         $this->mailer = new \Swift_Mailer($transport);
     }
 
@@ -127,68 +128,37 @@ class Mailer implements MailerInterface
     }
 
     /**
-     * Get email compillers config
-     *
-     * @return array
-     */
-    public function getCompilers(): array
-    {
-        $compilers = $this->options['compillers'] ?? [];
-        if (\is_string($compilers) == true) {
-            $compilers = \json_encode($compilers);
-        }
-
-        return (\is_array($compilers) == false) ? [] : $compilers;
-    }
-
-    /**
      * Create message
      *
      * @param string|null $componentName
      * @param array $params
      * @param string|null language
-     * @return MailInterface
+     * @return MailInterface|null
      */
     public function create(?string $componentName = null, array $params = [], ?string $language = null)
     {
         $mail = new Mail($this);
 
-        return (empty($componentName) == false) ? $this->loadEmailComponent($componentName,$params,$language) : $mail;        
-    }
+        if (empty($componentName) == false) {
 
-    /**
-     * Load email component adn return mail object
-     *
-     * @param string $componentName
-     * @param array $params
-     * @param string|null $language
-     * @return MailInterface
-     */
-    public function loadEmailComponent(string $componentName, array $params = [], ?string $language = null)
-    {
-        $emailComponent = $this->page->createEmailComponent($componentName,$params,$language);
-        $emailComponent->setEmailCompillers($this->getCompilers());
-
-        $component = $emailComponent->renderComponent();
-        $properties = $component->getProperties();
-        $body = $component->getHtmlCode();
-
-        $mail = new Mail($this);
-        $mail->message($body);
-
-        if (Utils::hasHtml($body) == true) {
-            $mail->contentType('text/html');
-        } else {
-            $mail->contentType('text/plain');
-        }
-        
-        // subject
-        $subject = $properties['subject'] ?? '';
-        if (empty($subject) == false) {
-            $mail->subject($subject);
+            $component = $this->view->render($componentName,$params,$language);
+            if (\is_object($component) == false) {
+                throw new Exception('Email component render error ' . $componentName, 1);
+                return null;
+            }
+            
+            if (empty($component->getSubject()) == false) {
+                $mail->subject($component->getSubject());
+            }
+            // set body
+            $body = $component->getHtmlCode();
+            $mail->message($body);
+            // content type
+            $contentType = (Utils::hasHtml($body) == true) ? 'text/html' : 'text/plain';
+            $mail->contentType($contentType);
         }
 
-        return $mail;
+        return $mail;        
     }
 
     /**

@@ -90,7 +90,7 @@ class Mailer implements MailerInterface
             $transport = $driver->getMailerTransport();
             $this->driverName = $driver->getDriverName();
         }   
-
+        
         $this->error = null;
         $this->mailer = new \Swift_Mailer($transport);
     }
@@ -98,7 +98,7 @@ class Mailer implements MailerInterface
     /**
      * Create sendmail transport
      *
-     * @return Swift_Transport
+     * @return object
      */
     public static function crateSendmailTranspart()
     {
@@ -140,7 +140,6 @@ class Mailer implements MailerInterface
         $mail = new Mail($this);
 
         if (empty($componentName) == false) {
-
             $component = $this->view->render($componentName,$params,$language);
             if (\is_object($component) == false) {
                 throw new Exception('Email component render error ' . $componentName, 1);

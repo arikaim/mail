@@ -58,7 +58,7 @@ class Mailer implements MailerInterface
      * @var EmailViewInterface|null
      */
     private $view;
-
+  
     /**
      * Driver name
      *
@@ -76,7 +76,7 @@ class Mailer implements MailerInterface
         array $options, 
         EmailViewInterface $view, 
         ?MailerDriverInterface $driver = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null      
     ) 
     {
         $this->options = $options;
@@ -142,7 +142,7 @@ class Mailer implements MailerInterface
         if (empty($componentName) == false) {
             $component = $this->view->render($componentName,$params,$language);
             if (\is_object($component) == false) {
-                throw new Exception('Email component render error ' . $componentName, 1);
+                throw new Exception('Email component render error ' . $componentName,1);
                 return null;
             }
             

@@ -17,7 +17,7 @@ interface MailerDriverInterface
     /**
      * Get mailer trasport adapter
      *
-     * @return \Swift_Transport
+     * @return \Symfony\Component\Mailer\Transport
      */
     public function getMailerTransport();
 

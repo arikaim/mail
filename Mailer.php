@@ -9,6 +9,9 @@
  */
 namespace Arikaim\Core\Mail;
 
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer as SymfonyMailer;
+
 use Arikaim\Core\Mail\Mail;
 use Arikaim\Core\Utils\Utils;
 
@@ -34,7 +37,7 @@ class Mailer implements MailerInterface
     /**
      * Mailer object
      *
-     * @var Swift_Mailer
+     * @var Symfony\Component\Mailer\Mailer
      */
     private $mailer;
 
@@ -64,7 +67,7 @@ class Mailer implements MailerInterface
      *
      * @var string|null
      */
-    private $driverName = null;
+    private $driverName = 'sendmail';
 
     /**
     * Constructor
@@ -85,14 +88,13 @@ class Mailer implements MailerInterface
 
         if (empty($driver) == true) {
             $transport = Self::crateSendmailTranspart();
-            $this->driverName = 'sendmail';
         } else {
             $transport = $driver->getMailerTransport();
             $this->driverName = $driver->getDriverName();
-        }   
-        
+        }
+              
         $this->error = null;
-        $this->mailer = new \Swift_Mailer($transport);
+        $this->mailer = new SymfonyMailer($transport);
     }
 
     /**
@@ -102,7 +104,7 @@ class Mailer implements MailerInterface
      */
     public static function crateSendmailTranspart()
     {
-        return new \Swift_SendmailTransport('/usr/sbin/sendmail -bs');
+        return Transport::fromDsn('sendmail://default');       
     }
 
     /**
@@ -194,56 +196,41 @@ class Mailer implements MailerInterface
         $mail = $message->getMessage();
 
         if (empty($mail->getFrom()) == true) {
-            $mail->setFrom($this->getFromEmail(),$this->getFromName());
+            $mail->from($this->getFromEmail(),$this->getFromName());
         }
 
         try {
-            $result = $this->mailer->send($mail);
+            $this->mailer->send($mail);
             
-        } catch (\Swift_TransportException $e) { 
+        } catch (Exception $e) {
             $this->error = $e->getMessage();
-            $result = false;
-        } catch (\Exception $e) {
-            $this->error = $e->getMessage();
-            $result = false;
-        }
-        
-        if ($result > 0) {
-            if ($this->getOption('log',false) == true) {  
-                $this->logInfo(Self::LOG_INFO_MESSAGE,['driver' => $this->driverName]);
+            if ($this->getOption('log_error',false) == true) {
+                $this->logError(Self::LOG_ERROR_MESSAGE,[
+                    'error'  => $this->error,
+                    'driver' => $this->driverName
+                ]);
             }
-            return true;
-        } 
 
-        if ($this->getOption('log_error',false) == true) {
-            $this->logError(Self::LOG_ERROR_MESSAGE,[
-                'error'  => $this->error,
+            return false;
+        }
+               
+        if ($this->getOption('log',false) == true) {  
+            $this->logInfo(Self::LOG_INFO_MESSAGE,[
                 'driver' => $this->driverName
             ]);
         }
-
-        return false;       
+        
+        return true;       
     }
 
     /**
      * Get mailer transport
      *
-     * @return \Swift_Transport
+     * @return Symfony\Component\Mailer\Transport
      */
     public function getTransport()
     {
         return $this->mailer->getTransport();
-    }
-
-    /**
-     * Set transport driver
-     *
-     * @param \Swift_Transport $driver
-     * @return Swift_Mailer
-     */
-    public function setTransport($driver)
-    {
-        return $this->mailer = new \Swift_Mailer($driver);
     }
 
     /**

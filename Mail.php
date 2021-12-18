@@ -9,6 +9,8 @@
  */
 namespace Arikaim\Core\Mail;
 
+use Symfony\Component\Mime\Email;
+
 use Arikaim\Core\Mail\Interfaces\MailInterface;
 use Arikaim\Core\Interfaces\MailerInterface;
 
@@ -17,10 +19,13 @@ use Arikaim\Core\Interfaces\MailerInterface;
  */
 class Mail implements MailInterface
 { 
+    const HTML_CONTENT_TYPE = 'text/html';
+    const PLAIN_CONTENT_TYPE = 'text/plain';
+
     /**
      * Message
      *
-     * @var Swift_Message
+     * @var Symfony\Component\Mime\Email
      */
     protected $message;
 
@@ -32,21 +37,29 @@ class Mail implements MailInterface
     private $mailer;
 
     /**
+     * Email content type
+     *
+     * @var string
+     */
+    protected $contentType = Self::PLAIN_CONTENT_TYPE;
+
+    /**
      * Constructor
      *
      * @param MailerInterface $mailer
      */
     public function __construct(MailerInterface $mailer)
     {
+        $this->contentType = Self::PLAIN_CONTENT_TYPE;
         $this->mailer = $mailer;
-        $this->message = new \Swift_Message();
+        $this->message = new Email();
         $this->setDefaultFrom();
     } 
 
     /**
      * Set default from field
      *    
-     * @return Mail
+     * @return Self
      */
     public function setDefaultFrom()
     {
@@ -64,7 +77,7 @@ class Mail implements MailInterface
      * Create mail
      *
      * @param MailerInterface $mailer
-     * @return MailInterface
+     * @return Self
      */
     public static function create(MailerInterface $mailer)
     {
@@ -74,7 +87,7 @@ class Mail implements MailInterface
     /**
      * Build email
      *
-     * @return Mail
+     * @return Self
      */
     public function build()
     {
@@ -85,11 +98,11 @@ class Mail implements MailInterface
      * Set email subject
      *
      * @param string $subject
-     * @return Mail
+     * @return Self
      */
     public function subject(string $subject)
     {
-        $this->message->setSubject($subject);
+        $this->message->subject($subject);
 
         return $this;
     }
@@ -97,13 +110,14 @@ class Mail implements MailInterface
     /**
      * Attach file
      *
+     * @param string $path
      * @param string $file
-     * @return Mail
+     * @param string $contentType
+     * @return Self
      */
-    public function attach(string $file)
-    {
-        $attachment = \Swift_Attachment::fromPath($file);
-        $this->message->attach($attachment);
+    public function attach(string $path, string $name = null, string $contentType = null)
+    {      
+        $this->message->attachFromPath($path,$name,$contentType);
 
         return $this;
     }
@@ -113,11 +127,11 @@ class Mail implements MailInterface
      *
      * @param string|array $email
      * @param string|null $name
-     * @return Mail
+     * @return Self
      */
     public function from($email, ?string $name = null)
     {
-        $this->message->setFrom($email,$name);
+        $this->message->from($email);
 
         return $this;
     } 
@@ -127,11 +141,11 @@ class Mail implements MailInterface
      *
      * @param string|array $email
      * @param string|null $name
-     * @return Mail
+     * @return Self
      */
     public function to($email, ?string $name = null)
     {        
-        $this->message->setTo($email,$name);   
+        $this->message->to($email);   
 
         return $this;
     }
@@ -141,11 +155,11 @@ class Mail implements MailInterface
      *
      * @param string|array $email
      * @param string|null $name
-     * @return Mail
+     * @return Self
      */
     public function replyTo($email, ?string $name = null)
     {
-        $this->message->setReplyTo($email,$name);
+        $this->message->replyTo($email);
 
         return $this;
     }
@@ -155,11 +169,11 @@ class Mail implements MailInterface
      *
      * @param string|array $email
      * @param string|null $name
-     * @return Mail
+     * @return Self
      */
     public function cc($email, ?string $name = null)
     {
-        $this->message->setCc($email,$name);
+        $this->message->cc($email);
 
         return $this;
     }
@@ -169,11 +183,11 @@ class Mail implements MailInterface
      *
      * @param string|array $email
      * @param string|null $name
-     * @return Mail
+     * @return Self
      */
     public function bcc($email, ?string $name = null)
     {
-        $this->message->setBcc($email,$name);
+        $this->message->bcc($email);
 
         return $this;
     }
@@ -182,11 +196,11 @@ class Mail implements MailInterface
      * Set priority
      *
      * @param integer $priority
-     * @return Mail
+     * @return Self
      */
     public function priority(int $priority = 3)
     {
-        $this->message->setPriority($priority);
+        $this->message->priority($priority);
 
         return $this;
     }
@@ -195,11 +209,20 @@ class Mail implements MailInterface
      * Set email body
      *
      * @param string $message
-     * @return Mail
+     * @return Self
      */
-    public function message(string $message)
+    public function message(string $message, ?string $contentType = null)
     {
-        $this->message->setBody($message);
+        if (empty($contentType) == true) {
+            // detect 
+            $this->contentType = ($message != \strip_tags($message)) ? Self::HTML_CONTENT_TYPE : Self::PLAIN_CONTENT_TYPE;              
+        }
+
+        if ($this->contentType == Self::HTML_CONTENT_TYPE) {
+            $this->message->html($message);
+        } else {
+            $this->message->text($message);
+        }
 
         return $this;
     }
@@ -208,21 +231,21 @@ class Mail implements MailInterface
      * Set email content type
      *
      * @param string $type
-     * @return Mail
+     * @return Self
      */
-    public function contentType(string $type = 'text/plain')
+    public function contentType(string $type = Self::PLAIN_CONTENT_TYPE)
     {
-        $this->message->setContentType($type);
-
+        $this->contentType = $type;
+    
         return $this;
     }
 
     /**
      * Return message body
      *
-     * @return string
+     * @return mixed
      */
-    public function getBody(): ?string
+    public function getBody()
     {
         return $this->message->getBody();
     }
@@ -230,7 +253,7 @@ class Mail implements MailInterface
     /**
      * Get message instance
      *
-     * @return Swift_Message
+     * @return Symfony\Component\Mime\Email
      */
     public function getMessage()
     {
@@ -250,7 +273,7 @@ class Mail implements MailInterface
     /**
      * Get error message
      *
-     * @return string
+     * @return string|null
      */
     public function getError(): ?string
     {

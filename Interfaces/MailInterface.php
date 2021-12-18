@@ -22,9 +22,9 @@ interface MailInterface
     public function build();
 
     /**
-     * Get Swift_Message message instance
+     * Get Email message instance
      *
-     * @return Swift_Message
+     * @return Symfony\Component\Mime\Email
      */
     public function getMessage();
 }

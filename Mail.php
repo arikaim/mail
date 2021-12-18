@@ -10,6 +10,7 @@
 namespace Arikaim\Core\Mail;
 
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
 
 use Arikaim\Core\Mail\Interfaces\MailInterface;
 use Arikaim\Core\Interfaces\MailerInterface;
@@ -131,7 +132,8 @@ class Mail implements MailInterface
      */
     public function from($email, ?string $name = null)
     {
-        $this->message->from($email);
+        $address = (empty($name) == false) ? new Address($email,$name) : $email;
+        $this->message->from($address);
 
         return $this;
     } 
@@ -145,7 +147,8 @@ class Mail implements MailInterface
      */
     public function to($email, ?string $name = null)
     {        
-        $this->message->to($email);   
+        $address = (empty($name) == false) ? new Address($email,$name) : $email;
+        $this->message->to($address);   
 
         return $this;
     }
@@ -159,7 +162,8 @@ class Mail implements MailInterface
      */
     public function replyTo($email, ?string $name = null)
     {
-        $this->message->replyTo($email);
+        $address = (empty($name) == false) ? new Address($email,$name) : $email;
+        $this->message->replyTo($address);
 
         return $this;
     }
@@ -173,7 +177,8 @@ class Mail implements MailInterface
      */
     public function cc($email, ?string $name = null)
     {
-        $this->message->cc($email);
+        $address = (empty($name) == false) ? new Address($email,$name) : $email;
+        $this->message->cc($address);
 
         return $this;
     }
@@ -187,7 +192,8 @@ class Mail implements MailInterface
      */
     public function bcc($email, ?string $name = null)
     {
-        $this->message->bcc($email);
+        $address = (empty($name) == false) ? new Address($email,$name) : $email;
+        $this->message->bcc($address);
 
         return $this;
     }

@@ -54,25 +54,7 @@ class Mail implements MailInterface
         $this->contentType = Self::PLAIN_CONTENT_TYPE;
         $this->mailer = $mailer;
         $this->message = new Email();
-        $this->setDefaultFrom();
     } 
-
-    /**
-     * Set default from field
-     *    
-     * @return Self
-     */
-    public function setDefaultFrom()
-    {
-        $options = $this->mailer->getOptions();
-        $from = $options['mailer']['from']['email'] ?? null;
-        $fromName = $options['mailer']['from']['name'] ?? null;
-        if (empty($from) == false) {
-            $this->from($from,$fromName);
-        }
-
-        return $this;
-    }
 
     /**
      * Create mail
@@ -137,6 +119,14 @@ class Mail implements MailInterface
 
         return $this;
     } 
+
+    /**
+     *  Get from address  email, name
+     */
+    public function getFrom()
+    {
+        return $this->message->getFrom();
+    }
 
     /**
      * Set to

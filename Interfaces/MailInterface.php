@@ -27,4 +27,18 @@ interface MailInterface
      * @return Symfony\Component\Mime\Email
      */
     public function getMessage();
+
+    /**
+     *  Get from address  email, name
+     */
+    public function getFrom();
+
+    /**
+     * Set from
+     *
+     * @param string|array $email
+     * @param string|null $name
+     * @return Self
+     */
+    public function from($email, ?string $name = null);
 }

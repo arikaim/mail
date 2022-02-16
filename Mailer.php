@@ -192,12 +192,12 @@ class Mailer implements MailerInterface
     {
         $this->error = null;
 
+        if (empty($message->getFrom()) == true) {
+            $message->from($this->getFromEmail(),$this->getFromName());
+        }
+
         $message->build();
         $mail = $message->getMessage();
-
-        if (empty($mail->getFrom()) == true) {
-            $mail->from($this->getFromEmail(),$this->getFromName());
-        }
 
         try {
             $this->mailer->send($mail);

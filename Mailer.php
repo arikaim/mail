@@ -87,7 +87,7 @@ class Mailer implements MailerInterface
         $this->setLogger($logger);
 
         if (empty($driver) == true) {
-            $transport = Self::crateSendmailTranspart();
+            $transport = Self::crateSendmailTranspart();           
         } else {
             $transport = $driver->getMailerTransport();
             $this->driverName = $driver->getDriverName();

@@ -14,6 +14,7 @@ use Symfony\Component\Mime\Address;
 
 use Arikaim\Core\Mail\Interfaces\MailInterface;
 use Arikaim\Core\Interfaces\MailerInterface;
+use Exception;
 
 /**
  * Mail base class
@@ -45,6 +46,13 @@ class Mail implements MailInterface
     protected $contentType = Self::PLAIN_CONTENT_TYPE;
 
     /**
+     *  Errors
+     *  
+     *  @var array
+     */
+    protected $errors = [];
+
+    /**
      * Constructor
      *
      * @param MailerInterface $mailer
@@ -54,7 +62,28 @@ class Mail implements MailInterface
         $this->contentType = Self::PLAIN_CONTENT_TYPE;
         $this->mailer = $mailer;
         $this->message = new Email();
+        $this->errors = [];
     } 
+
+    /**
+     * Get errors
+     *
+     * @return array
+     */
+    public function getErros(): array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Has errors
+     *
+     * @return bool
+     */
+    public function hasError(): bool
+    {
+        return (count($this->errros) > 0);
+    }
 
     /**
      * Create mail
@@ -114,9 +143,13 @@ class Mail implements MailInterface
      */
     public function from($email, ?string $name = null)
     {
-        $address = (empty($name) == false) ? new Address($email,$name) : $email;
-        $this->message->from($address);
-
+        try {
+            $address = (empty($name) == false) ? new Address($email,$name) : $email;
+            $this->message->from($address);
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
+       
         return $this;
     } 
 
@@ -137,8 +170,12 @@ class Mail implements MailInterface
      */
     public function to($email, ?string $name = null)
     {        
-        $address = (empty($name) == false) ? new Address($email,$name) : $email;
-        $this->message->to($address);   
+        try {
+            $address = (empty($name) == false) ? new Address($email,$name) : $email;
+            $this->message->to($address);   
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
 
         return $this;
     }
@@ -152,8 +189,12 @@ class Mail implements MailInterface
      */
     public function replyTo($email, ?string $name = null)
     {
-        $address = (empty($name) == false) ? new Address($email,$name) : $email;
-        $this->message->replyTo($address);
+        try {
+            $address = (empty($name) == false) ? new Address($email,$name) : $email;
+            $this->message->replyTo($address);
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
 
         return $this;
     }
@@ -167,8 +208,12 @@ class Mail implements MailInterface
      */
     public function cc($email, ?string $name = null)
     {
-        $address = (empty($name) == false) ? new Address($email,$name) : $email;
-        $this->message->cc($address);
+        try {
+            $address = (empty($name) == false) ? new Address($email,$name) : $email;
+            $this->message->cc($address);
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
 
         return $this;
     }
@@ -182,8 +227,12 @@ class Mail implements MailInterface
      */
     public function bcc($email, ?string $name = null)
     {
-        $address = (empty($name) == false) ? new Address($email,$name) : $email;
-        $this->message->bcc($address);
+        try {
+            $address = (empty($name) == false) ? new Address($email,$name) : $email;
+            $this->message->bcc($address);
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+        }
 
         return $this;
     }

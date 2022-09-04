@@ -200,6 +200,7 @@ class Mailer implements MailerInterface
         $mail = $message->getMessage();
 
         try {
+            
             $this->mailer->send($mail);
             
         } catch (Exception $e) {

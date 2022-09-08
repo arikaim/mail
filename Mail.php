@@ -137,13 +137,14 @@ class Mail implements MailInterface
     /**
      * Set from
      *
-     * @param string|array $email
+     * @param string $email
      * @param string|null $name
      * @return Self
      */
     public function from($email, ?string $name = null)
     {
         try {
+            $email = \trim($email);
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->from($address);
         } catch (Exception $e) {
@@ -164,13 +165,15 @@ class Mail implements MailInterface
     /**
      * Set to
      *
-     * @param string|array $email
+     * @param string $email
      * @param string|null $name
      * @return Self
      */
     public function to($email, ?string $name = null)
     {        
         try {
+            $email = \trim($email);
+
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->to($address);   
         } catch (Exception $e) {
@@ -183,13 +186,14 @@ class Mail implements MailInterface
     /**
      * Set reply to
      *
-     * @param string|array $email
+     * @param string $email
      * @param string|null $name
      * @return Self
      */
     public function replyTo($email, ?string $name = null)
     {
         try {
+            $email = \trim($email);
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->replyTo($address);
         } catch (Exception $e) {
@@ -202,13 +206,14 @@ class Mail implements MailInterface
     /**
      * Set cc
      *
-     * @param string|array $email
+     * @param string $email
      * @param string|null $name
      * @return Self
      */
     public function cc($email, ?string $name = null)
     {
         try {
+            $email = \trim($email);
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->cc($address);
         } catch (Exception $e) {
@@ -221,13 +226,14 @@ class Mail implements MailInterface
     /**
      * Set bcc
      *
-     * @param string|array $email
+     * @param string $email
      * @param string|null $name
      * @return Self
      */
     public function bcc($email, ?string $name = null)
     {
         try {
+            $email = \trim($email);
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->bcc($address);
         } catch (Exception $e) {

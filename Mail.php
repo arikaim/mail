@@ -144,7 +144,7 @@ class Mail implements MailInterface
     public function from($email, ?string $name = null)
     {
         try {
-            $email = \trim($email);
+            $email = \trim($email ?? '');
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->from($address);
         } catch (Exception $e) {
@@ -172,7 +172,7 @@ class Mail implements MailInterface
     public function to($email, ?string $name = null)
     {        
         try {
-            $email = \trim($email);
+            $email = \trim($email ?? '');
 
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->to($address);   
@@ -193,7 +193,7 @@ class Mail implements MailInterface
     public function replyTo($email, ?string $name = null)
     {
         try {
-            $email = \trim($email);
+            $email = \trim($email ?? '');
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->replyTo($address);
         } catch (Exception $e) {
@@ -213,7 +213,7 @@ class Mail implements MailInterface
     public function cc($email, ?string $name = null)
     {
         try {
-            $email = \trim($email);
+            $email = \trim($email ?? '');
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->cc($address);
         } catch (Exception $e) {
@@ -233,7 +233,7 @@ class Mail implements MailInterface
     public function bcc($email, ?string $name = null)
     {
         try {
-            $email = \trim($email);
+            $email = \trim($email ?? '');
             $address = (empty($name) == false) ? new Address($email,$name) : $email;
             $this->message->bcc($address);
         } catch (Exception $e) {

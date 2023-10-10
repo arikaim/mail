@@ -143,7 +143,7 @@ class Mailer implements MailerInterface
 
         if (empty($componentName) == false) {
             $component = $this->view->render($componentName,$params,$language);
-            if (\is_object($component) == false) {
+            if ($component == null) {
                 throw new Exception('Email component render error ' . $componentName,1);
                 return null;
             }

@@ -82,7 +82,7 @@ class Mail implements MailInterface
      */
     public function hasError(): bool
     {
-        return (count($this->errros) > 0);
+        return (count($this->errors) > 0);
     }
 
     /**
@@ -91,7 +91,7 @@ class Mail implements MailInterface
      * @param MailerInterface $mailer
      * @return Self
      */
-    public static function create(MailerInterface $mailer)
+    public static function create(MailerInterface $mailer): object
     {
         return new Self($mailer);
     }
@@ -101,7 +101,7 @@ class Mail implements MailInterface
      *
      * @return Self
      */
-    public function build()
+    public function build(): object
     {
         return $this;
     }
@@ -112,7 +112,7 @@ class Mail implements MailInterface
      * @param string $subject
      * @return Self
      */
-    public function subject(string $subject)
+    public function subject(string $subject): object
     {
         $this->message->subject($subject);
 
@@ -127,7 +127,7 @@ class Mail implements MailInterface
      * @param string $contentType
      * @return Self
      */
-    public function attach(string $path, string $name = null, string $contentType = null)
+    public function attach(string $path, string $name = null, string $contentType = null): object
     {      
         $this->message->attachFromPath($path,$name,$contentType);
 
@@ -141,7 +141,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Self
      */
-    public function from($email, ?string $name = null)
+    public function from($email, ?string $name = null): object
     {
         try {
             $email = \trim($email ?? '');
@@ -169,7 +169,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Self
      */
-    public function to($email, ?string $name = null)
+    public function to($email, ?string $name = null): object
     {        
         try {
             $email = \trim($email ?? '');
@@ -190,7 +190,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Self
      */
-    public function replyTo($email, ?string $name = null)
+    public function replyTo($email, ?string $name = null): object
     {
         try {
             $email = \trim($email ?? '');
@@ -210,7 +210,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Self
      */
-    public function cc($email, ?string $name = null)
+    public function cc($email, ?string $name = null): object
     {
         try {
             $email = \trim($email ?? '');
@@ -230,7 +230,7 @@ class Mail implements MailInterface
      * @param string|null $name
      * @return Self
      */
-    public function bcc($email, ?string $name = null)
+    public function bcc($email, ?string $name = null): object
     {
         try {
             $email = \trim($email ?? '');
@@ -249,7 +249,7 @@ class Mail implements MailInterface
      * @param integer $priority
      * @return Self
      */
-    public function priority(int $priority = 3)
+    public function priority(int $priority = 3): object
     {
         $this->message->priority($priority);
 
@@ -262,7 +262,7 @@ class Mail implements MailInterface
      * @param string $message
      * @return Self
      */
-    public function message(string $message, ?string $contentType = null)
+    public function message(string $message, ?string $contentType = null): object
     {
         if (empty($contentType) == true) {
             // detect 
@@ -284,7 +284,7 @@ class Mail implements MailInterface
      * @param string $type
      * @return Self
      */
-    public function contentType(string $type = Self::PLAIN_CONTENT_TYPE)
+    public function contentType(string $type = Self::PLAIN_CONTENT_TYPE): object
     {
         $this->contentType = $type;
     

@@ -19,7 +19,7 @@ interface MailInterface
      *
      * @return MailInterface
      */ 
-    public function build();
+    public function build(): object;
 
     /**
      * Get Email message instance
@@ -40,5 +40,5 @@ interface MailInterface
      * @param string|null $name
      * @return Self
      */
-    public function from($email, ?string $name = null);
+    public function from($email, ?string $name = null): object;
 }
